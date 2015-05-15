@@ -9,6 +9,7 @@ MODULES += \
 	lib/bytes \
 	lib/cksum \
 	lib/debugcommands \
+	lib/gcov \
 	lib/libm
 
 WITH_LINKER_GC := 0

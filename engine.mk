@@ -62,6 +62,8 @@ GLOBAL_LDFLAGS :=
 
 GLOBAL_LDFLAGS += -L $(LKROOT)
 
+GLOBAL_CFLAGS += -fprofile-arcs -ftest-coverage
+
 # top level rule
 all:: $(OUTBIN) $(OUTELF).lst $(OUTELF).debug.lst $(OUTELF).sym $(OUTELF).sym.sorted $(OUTELF).size
 

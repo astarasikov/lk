@@ -1,0 +1,7 @@
+export DEFAULT_PROJECT=vexpress-a9-test
+export TOOLCHAIN_PREFIX=/Users/alexander/Documents/workspace/bin/toolchains/gcc-arm-none-eabi-4_8-2014q1/bin/arm-none-eabi-
+make -j10
+qemu-system-arm -M vexpress-a9 -kernel build-vexpress-a9-test/lk.elf -serial stdio -m 1024 2>&1  | tee log_gcov
+
+> gcov_dump
+killall qemu-system-arm

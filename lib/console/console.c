@@ -80,6 +80,13 @@ static cmd_block *command_list = NULL;
 extern cmd_block __commands_start;
 extern cmd_block __commands_end;
 
+extern void gcov_dump(void);
+static int cmd_gcov_dump(int argc, const cmd_args *argv)
+{
+	gcov_dump();
+	return 0;
+}
+
 static int cmd_help(int argc, const cmd_args *argv);
 static int cmd_echo(int argc, const cmd_args *argv);
 static int cmd_test(int argc, const cmd_args *argv);
@@ -88,6 +95,7 @@ static int cmd_history(int argc, const cmd_args *argv);
 #endif
 
 STATIC_COMMAND_START
+STATIC_COMMAND("gcov_dump", NULL, &cmd_gcov_dump)
 STATIC_COMMAND("help", "this list", &cmd_help)
 STATIC_COMMAND("echo", NULL, &cmd_echo)
 #if LK_DEBUGLEVEL > 1
