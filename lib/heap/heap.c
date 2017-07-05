@@ -36,7 +36,8 @@
 
 #define LOCAL_TRACE 0
 
-#define DEBUG_HEAP 0
+//TODO(astarasikov): enable DEBUG_HEAP for KASAN builds to get heap redzone
+#define DEBUG_HEAP 1
 #define ALLOC_FILL 0x99
 #define FREE_FILL 0x77
 #define PADDING_FILL 0x55
@@ -253,8 +254,9 @@ static struct free_heap_chunk *heap_create_free_chunk(void *ptr, size_t len, boo
 	DEBUG_ASSERT((len % sizeof(void *)) == 0); // size must be aligned on pointer boundary
 
 #if DEBUG_HEAP
-	if (allow_debug)
+	if (allow_debug) {
 		memset(ptr, FREE_FILL, len);
+	}
 #endif
 
 	struct free_heap_chunk *chunk = (struct free_heap_chunk *)ptr;
@@ -265,7 +267,7 @@ static struct free_heap_chunk *heap_create_free_chunk(void *ptr, size_t len, boo
 
 static void heap_free_delayed_list(void)
 {
-	struct list_node list;
+	struct list_node list = {};
 
 	list_initialize(&list);
 
@@ -386,14 +388,17 @@ retry:
 			if (theheap.remaining < theheap.low_watermark) {
 				theheap.low_watermark = theheap.remaining;
 			}
+			extern void _kasan_hook_malloc(void *ptr, size_t size, void *redzone, size_t redsize);
 #if DEBUG_HEAP
 			as->padding_start = ((uint8_t *)ptr + original_size);
 			as->padding_size = (((addr_t)chunk + size) - ((addr_t)ptr + original_size));
 //			printf("padding start %p, size %u, chunk %p, size %u\n", as->padding_start, as->padding_size, chunk, size);
 
 			memset(as->padding_start, PADDING_FILL, as->padding_size);
+			_kasan_hook_malloc(ptr, size, as->padding_start, as->padding_size);
+#else
+			_kasan_hook_malloc(ptr, size, 0, 0);
 #endif
-
 			break;
 		}
 	}
@@ -414,7 +419,6 @@ retry:
 #endif
 
 	LTRACEF("returning ptr %p\n", ptr);
-
 	return ptr;
 }
 
@@ -431,7 +435,8 @@ void heap_free(void *ptr)
 
 	DEBUG_ASSERT(as->magic == HEAP_MAGIC);
 
-#if DEBUG_HEAP
+	//TODO(astarasikov): for KASAN we need to unpoison the redzone while checking the padding
+#if 0 //DEBUG_HEAP
 	{
 		uint i;
 		uint8_t *pad = (uint8_t *)as->padding_start;
@@ -450,6 +455,10 @@ void heap_free(void *ptr)
 
 	// looks good, create a free chunk and add it to the pool
 	heap_insert_free_chunk(heap_create_free_chunk(as->ptr, as->size, true));
+		
+	//TODO(astarasikov): this is not working as expected
+	extern void _kasan_hook_free(void *ptr, size_t size);
+	_kasan_hook_free(ptr, 1);
 }
 
 void heap_delayed_free(void *ptr)

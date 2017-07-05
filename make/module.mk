@@ -48,6 +48,10 @@ MODULES += $(MODULE_DEPS)
 #$(info MODULE_DEPS $(MODULE_DEPS))
 #$(info MODULE_SRCS $(MODULE_SRCS))
 
+ifeq ($(MODULE_CFLAGS),)
+	MODULE_CFLAGS := -fsanitize=kernel-address -fasan-shadow-offset=0xd0000000 --param asan-stack=0 --param asan-globals=1
+endif
+
 MODULE_DEFINES += MODULE_COMPILEFLAGS=\"$(subst $(SPACE),_,$(MODULE_COMPILEFLAGS))\"
 MODULE_DEFINES += MODULE_CFLAGS=\"$(subst $(SPACE),_,$(MODULE_CFLAGS))\"
 MODULE_DEFINES += MODULE_CPPFLAGS=\"$(subst $(SPACE),_,$(MODULE_CPPFLAGS))\"

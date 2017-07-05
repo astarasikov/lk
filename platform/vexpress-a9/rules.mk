@@ -14,7 +14,7 @@ MODULE_SRCS += \
 	$(LOCAL_DIR)/uart.c
 
 MEMBASE := 0x60000000
-MEMSIZE := 0x20000000	# 512MB
+MEMSIZE := 0x10000000	# 256MB, top 256MB are ASAN shadow
 
 MODULE_DEPS += \
 	lib/cbuf \

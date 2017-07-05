@@ -3,6 +3,7 @@ LOCAL_DIR := $(GET_LOCAL_DIR)
 MODULE := $(LOCAL_DIR)
 
 MODULE_DEPS := \
+	lib/kasan \
 	lib/libc \
 	lib/debug \
 	lib/heap

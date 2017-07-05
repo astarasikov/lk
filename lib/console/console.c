@@ -87,6 +87,27 @@ static int cmd_gcov_dump(int argc, const cmd_args *argv)
 	return 0;
 }
 
+static int cmd_kasan_test(int argc, const cmd_args *argv)
+{
+	printf("KASAN: trying OOB write on a global\n");
+	//test KASan on a global
+	((char*)&history)[5] = 0x42;
+
+	printf("KASAN: trying OOB write on heap\n");
+	char *foo = malloc(5);
+	foo[5] = 42;
+	free(foo);
+
+	printf("KASAN: trying UAF on heap\n");
+	foo[0] = 42;
+	foo[1] = 42;
+	foo[2] = 42;
+
+	printf("KASAN: all tests are done\n");
+
+	return 0;
+}
+
 static int cmd_help(int argc, const cmd_args *argv);
 static int cmd_echo(int argc, const cmd_args *argv);
 static int cmd_test(int argc, const cmd_args *argv);
@@ -95,6 +116,7 @@ static int cmd_history(int argc, const cmd_args *argv);
 #endif
 
 STATIC_COMMAND_START
+STATIC_COMMAND("kasan_test", NULL, &cmd_kasan_test)
 STATIC_COMMAND("gcov_dump", NULL, &cmd_gcov_dump)
 STATIC_COMMAND("help", "this list", &cmd_help)
 STATIC_COMMAND("echo", NULL, &cmd_echo)
@@ -127,6 +149,7 @@ int console_init(void)
 }
 
 #if CONSOLE_ENABLE_HISTORY
+
 static int cmd_history(int argc, const cmd_args *argv)
 {
 	dump_history();

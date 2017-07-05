@@ -62,7 +62,10 @@ GLOBAL_LDFLAGS :=
 
 GLOBAL_LDFLAGS += -L $(LKROOT)
 
-GLOBAL_CFLAGS += -fprofile-arcs -ftest-coverage
+#TODO(astarasikov): add defines to target/project makefiles to enable KASAN/gcov
+#TODO(astarasikov): define KASAN shadow address/size as a symbol instead of hardcoding
+#GLOBAL_CFLAGS += -fprofile-arcs -ftest-coverage
+#GLOBAL_CFLAGS += -fsanitize=kernel-address -fasan-shadow-offset=0xd0000000 --param asan-stack=0 --param asan-globals=1
 
 # top level rule
 all:: $(OUTBIN) $(OUTELF).lst $(OUTELF).debug.lst $(OUTELF).sym $(OUTELF).sym.sorted $(OUTELF).size
